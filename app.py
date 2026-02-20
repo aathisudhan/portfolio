@@ -2,11 +2,12 @@ from flask import Flask, render_template, request, redirect, url_for, session, j
 import os
 import json
 import firebase_admin
-from firebase_admin import credentials, db # Added db here to ensure reference() works
+from firebase_admin import credentials, db
 from firebase_config import get_db, get_portfolio_ref, DATABASE_URL
 from werkzeug.security import check_password_hash
 
 app = Flask(__name__)
+# Security: Use a real secret key on Render, fallback to dev locally
 app.secret_key = os.environ.get('FLASK_SECRET', 'dev-secret-key')
 
 def get_db_ref():
@@ -20,14 +21,13 @@ def get_db_ref():
 @app.route('/')
 def index():
     try:
-        # Use the imported get_portfolio_ref to stay consistent
         ref = get_portfolio_ref()
         portfolio_data = ref.get() or {}
     except Exception:
         portfolio_data = {}
     return render_template('index.html', data=portfolio_data)
 
-# --- API ROUTES (Used by admin.html JavaScript) ---
+# --- API ROUTES ---
 
 @app.route('/api/data', methods=['GET'])
 def api_get_data():
@@ -47,7 +47,6 @@ def api_add_entry(category):
     ref = get_portfolio_ref()
     
     try:
-        # Match your logic: profile/socials overwrite, others push
         if category in ['profile', 'socials', 'description']:
             ref.child(category).set(entry)
             return jsonify({'success': True})
@@ -63,7 +62,6 @@ def api_update_entry(category, item_id):
     entry = request.get_json() or {}
     ref = get_portfolio_ref()
     try:
-        # Fixed pathing to use the specific item ID
         ref.child(category).child(item_id).update(entry)
         return jsonify({'success': True})
     except Exception as e:
@@ -87,6 +85,8 @@ def login():
     if request.method == 'POST':
         email = request.form.get('email', '').strip().lower()
         password = request.form.get('password', '')
+        
+        # CHANGED: Load from Env Var or File
         admin_creds = load_admin() or {}
 
         if not email or not password:
@@ -107,7 +107,6 @@ def admin():
     
     ref = get_portfolio_ref()
     portfolio_data = ref.get() or {}
-    # Passing 'data' ensures admin.html loops work
     return render_template('admin.html', data=portfolio_data)
 
 @app.route('/logout')
@@ -115,46 +114,55 @@ def logout():
     session.pop('admin', None)
     return redirect(url_for('index'))
 
-# --- DIAGNOSTICS (Kept exactly as requested) ---
-
-@app.route('/db_test')
-def db_test():
-    try:
-        sample = db.reference('/').get()
-        return {'connected': True, 'sample_preview': sample}
-    except Exception as e:
-        return {'connected': False, 'error': str(e)}, 500
+# --- DIAGNOSTICS ---
 
 @app.route('/firebase_status')
 def firebase_status():
     info = {'database_url': DATABASE_URL}
-    cred_path = os.environ.get('GOOGLE_APPLICATION_CREDENTIALS', 'serviceAccount.json')
+    # UPDATED: Check for Render Secret Path or local
+    render_path = '/etc/secrets/FIREBASE_SERVICE_ACCOUNT'
+    local_path = os.path.join(os.path.dirname(__file__), 'serviceAccount.json')
+    
+    cred_path = render_path if os.path.exists(render_path) else local_path
+    
     try:
         if os.path.exists(cred_path):
             with open(cred_path, 'r', encoding='utf-8') as f:
                 sa = json.load(f)
             info['service_account_project_id'] = sa.get('project_id')
+            info['path_used'] = cred_path
     except: pass
 
     ref = get_portfolio_ref()
     try:
         sample = ref.get()
-        info['db_test'] = {'ok': True, 'sample_preview': sample}
+        info['db_test'] = {'ok': True, 'connected': True}
     except Exception as e:
         info['db_test'] = {'ok': False, 'error': str(e)}
     return jsonify(info)
 
 # --- HELPERS ---
 
-ADMIN_CRED_FILE = os.path.join(os.path.dirname(__file__), 'admin_credentials.json')
-
 def load_admin():
+    # UPDATED: First check Render Environment Variable
+    admin_env = os.environ.get('ADMIN_CREDENTIALS')
+    if admin_env:
+        try:
+            return json.loads(admin_env)
+        except:
+            pass
+            
+    # Fallback to local file for development
+    local_file = os.path.join(os.path.dirname(__file__), 'admin_credentials.json')
     try:
-        if os.path.exists(ADMIN_CRED_FILE):
-            with open(ADMIN_CRED_FILE, 'r', encoding='utf-8') as f:
+        if os.path.exists(local_file):
+            with open(local_file, 'r', encoding='utf-8') as f:
                 return json.load(f)
-    except: return None
+    except: 
+        return None
     return None
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    # Use dynamic port for deployment
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
