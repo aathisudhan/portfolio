@@ -1,36 +1,46 @@
 import os
+import json
 import firebase_admin
 from firebase_admin import credentials, db
 
-# Preferred explicit DB URL (from your instruction)
+# 1. Database URL from Render environment or fallback
 DATABASE_URL = os.environ.get('FIREBASE_DATABASE_URL', 'https://portfolio-imgn-default-rtdb.asia-southeast1.firebasedatabase.app/')
 
 def initialize_firebase():
     if firebase_admin._apps:
         return
-    cred_path = os.environ.get('GOOGLE_APPLICATION_CREDENTIALS', 'serviceAccount.json')
-    if not os.path.exists(cred_path):
-        print(f"Warning: service account not found at {cred_path}")
+
+    # Render places "Secret Files" in /etc/secrets/
+    render_secret_path = '/etc/secrets/FIREBASE_SERVICE_ACCOUNT'
+    local_path = 'serviceAccount.json'
+
+    if os.path.exists(render_secret_path):
+        # Case: On Render (using Secret File)
+        cred_path = render_secret_path
+        print("Using Render Secret File for Firebase.")
+    elif os.path.exists(local_path):
+        # Case: Local development
+        cred_path = local_path
+        print("Using local serviceAccount.json for Firebase.")
+    else:
+        print("CRITICAL: No Firebase credentials found!")
         return
+
     try:
         cred = credentials.Certificate(cred_path)
         firebase_admin.initialize_app(cred, {'databaseURL': DATABASE_URL})
-        print(f"Firebase initialized with DB URL: {DATABASE_URL}")
+        print(f"Firebase initialized successfully with DB: {DATABASE_URL}")
     except Exception as e:
         print(f"Failed to initialize Firebase: {e}")
 
-# Initialize on import (idempotent)
+# Run initialization
 initialize_firebase()
 
 def get_db():
-    """Return the `firebase_admin.db` module for making references.
-    Example usage: get_db().reference('portfolio').get()
-    """
     return db
 
 def get_portfolio_ref():
-    """Convenience: return reference to the `portfolio` node."""
     try:
-        return get_db().reference('portfolio')
+        return db.reference('portfolio')
     except Exception:
         return None
