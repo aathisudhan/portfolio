@@ -140,7 +140,17 @@ def firebase_status():
     except Exception as e:
         info['db_test'] = {'ok': False, 'error': str(e)}
     return jsonify(info)
-
+    
+# --- CERTIFICATIONS ROUTE ---
+@app.route('/certifications')
+def certifications():
+    try:
+        ref = get_portfolio_ref()
+        portfolio_data = ref.get() or {}
+    except Exception:
+        portfolio_data = {}
+    return render_template('certifications.html', data=portfolio_data)
+    
 # --- HELPERS ---
 
 def load_admin():
