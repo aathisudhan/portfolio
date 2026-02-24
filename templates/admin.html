@@ -137,20 +137,26 @@
         </div>
 
         <div class="card" id="card-projects">
-            <h3>🚀 Projects</h3>
+            <h3>🚀 Projects (Points View)</h3>
             <input type="text" id="pj-title" placeholder="Project Title">
-            <input type="text" id="pj-dom" placeholder="Domain">
-            <input type="text" id="pj-link" placeholder="GitHub/Live URL">
-            <textarea id="pj-desc" placeholder="Brief details about the project"></textarea>
-            <div class="action-group">
-                <button class="btn btn-primary" id="pj-btn" onclick="pushData('projects', {title:'pj-title', domain:'pj-dom', link:'pj-link', desc:'pj-desc'})">Add Project</button>
-                <button class="btn btn-outline" id="pj-cancel" onclick="cancelEdit('projects')">Cancel</button>
+            <input type="text" id="pj-dom" placeholder="Domain (e.g. Machine Learning)">
+            <input type="text" id="pj-link" placeholder="Live/GitHub URL">
+            
+            <label style="font-size: 11px; color: var(--g-gray);">DESCRIPTION POINTS (MAX 3)</label>
+            <input type="text" id="pj-p1" class="point-input" placeholder="Point 1: Key feature or tech used">
+            <input type="text" id="pj-p2" class="point-input" placeholder="Point 2: Development detail">
+            <input type="text" id="pj-p3" class="point-input" placeholder="Point 3: Impact or Result">
+
+            <div class="btn-row">
+                <button class="btn btn-blue" onclick="pushData('projects', {title:'pj-title', domain:'pj-dom', link:'pj-link', p1:'pj-p1', p2:'pj-p2', p3:'pj-p3'})">Save Project</button>
+                <button class="btn btn-cancel" onclick="resetForm('projects')">Cancel</button>
             </div>
-            <div class="preview-list">
+
+            <div class="item-list">
                 {% for id, item in data.get('projects', {}).items() %}
-                <div class="list-item">
-                    <span class="item-text">{{item.title}}</span>
-                    <button class="ctrl-btn" onclick="startEdit('projects','{{id}}')">✎</button>
+                <div class="item-row">
+                    <span><b>{{item.title}}</b></span>
+                    <span style="color:var(--g-blue); cursor:pointer" onclick="editProject('{{id}}')">✎ Edit</span>
                 </div>
                 {% endfor %}
             </div>
