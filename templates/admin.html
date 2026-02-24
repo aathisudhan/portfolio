@@ -79,22 +79,29 @@
         </div>
 
         <div class="card">
-            <h3>📊 Coding & Platforms (Single editable entries)</h3>
-            <p style="font-size:13px; color:#5f6368; margin:6px 0 10px 0;">LeetCode</p>
-            <input type="text" id="lc-username" placeholder="LeetCode Username">
-            <input type="text" id="lc-link" placeholder="LeetCode Link">
-            <p style="font-size:13px; color:#5f6368; margin:6px 0 10px 0;">HackerRank</p>
-            <input type="text" id="hr-username" placeholder="HackerRank Username">
-            <input type="text" id="hr-link" placeholder="HackerRank Link">
-            <p style="font-size:13px; color:#5f6368; margin:6px 0 10px 0;">GitHub</p>
-            <input type="text" id="gh-username" placeholder="GitHub Username">
-            <input type="text" id="gh-link" placeholder="GitHub Link">
-            <button class="btn-add" onclick="pushData('socials', {leetcode_user:'lc-username', leetcode_link:'lc-link', hackerrank_user:'hr-username', hackerrank_link:'hr-link', github_user:'gh-username', github_link:'gh-link'})">Save Profiles</button>
+            <h3>📊 Socials & Coding Platforms</h3>
+            
+            <p style="font-size:13px; color:#5f6368; margin:6px 0 2px 0;">GitHub Link</p>
+            <input type="text" id="social-github" placeholder="https://github.com/..." value="{{data.get('socials', {}).get('github_link', '')}}">
+            
+            <p style="font-size:13px; color:#5f6368; margin:6px 0 2px 0;">HackerRank Link</p>
+            <input type="text" id="social-hackerrank" placeholder="https://hackerrank.com/..." value="{{data.get('socials', {}).get('hackerrank_link', '')}}">
+            
+            <p style="font-size:13px; color:#5f6368; margin:6px 0 2px 0;">LeetCode Link</p>
+            <input type="text" id="social-leetcode" placeholder="https://leetcode.com/..." value="{{data.get('socials', {}).get('leetcode_link', '')}}">
+            
+            <p style="font-size:13px; color:#5f6368; margin:6px 0 2px 0;">LinkedIn Link</p>
+            <input type="text" id="social-linkedin" placeholder="https://linkedin.com/in/..." value="{{data.get('socials', {}).get('linkedin_link', '')}}">
+        
+            <button class="btn-add" onclick="saveSocials()">Save Social Profiles</button>
+            
             <div class="list-container" id="socials-preview">
                 {% if data.get('socials') %}
-                <div class="live-item"><span>Profiles saved</span></div>
+                <div class="live-item" style="border-left: 4px solid var(--g-blue);">
+                    <span><strong>Status:</strong> Profiles are live</span>
+                </div>
                 {% else %}
-                <div class="empty-msg">No social profiles saved yet.</div>
+                <div class="empty-msg">No social links saved yet.</div>
                 {% endif %}
             </div>
         </div>
