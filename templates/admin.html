@@ -88,7 +88,9 @@
             <label>GitHub Link</label><input type="text" id="s-gh" placeholder="https://..." value="{{data.get('socials', {}).get('github_link', '')}}">
             <label>LeetCode Link</label><input type="text" id="s-lc" placeholder="https://..." value="{{data.get('socials', {}).get('leetcode_link', '')}}">
             <label>HackerRank Link</label><input type="text" id="s-hr" placeholder="https://..." value="{{data.get('socials', {}).get('hackerrank_link', '')}}">
-            <button class="btn btn-primary" onclick="pushData('socials', {linkedin_link:'s-li', github_link:'s-gh', leetcode_link:'s-lc', hackerrank_link:'s-hr'})">Update Links</button>
+            <div class="action-group">
+                <button class="btn btn-primary" style="flex: none; width: auto; padding: 10px 30px;" onclick="pushData('socials', {linkedin_link:'s-li', github_link:'s-gh', leetcode_link:'s-lc', hackerrank_link:'s-hr'})">Update Links</button>
+            </div>
         </div>
 
         <div class="card" id="card-skills">
@@ -109,8 +111,8 @@
                 <div class="list-item">
                     <span class="item-text">{{item.name}} — <small style="color:var(--g-gray)">{{item.level}}</small></span>
                     <div class="item-ctrl">
-                        <button class="ctrl-btn" onclick="startEdit('skills','{{id}}')">✎</button>
-                        <button class="ctrl-btn" onclick="deleteData('skills','{{id}}')">×</button>
+                        <button class="ctrl-btn" style="color:var(--g-blue)" onclick="startEdit('skills','{{id}}')">✎</button>
+                        <button class="ctrl-btn" style="color:var(--g-red)" onclick="deleteData('skills','{{id}}')">×</button>
                     </div>
                 </div>
                 {% endfor %}
@@ -130,27 +132,39 @@
                 {% for id, item in data.get('education', {}).items() %}
                 <div class="list-item">
                     <span class="item-text">{{item.title}}</span>
-                    <button class="ctrl-btn" onclick="startEdit('education','{{id}}')">✎</button>
+                    <div class="item-ctrl">
+                        <button class="ctrl-btn" style="color:var(--g-blue)" onclick="startEdit('education','{{id}}')">✎</button>
+                        <button class="ctrl-btn" style="color:var(--g-red)" onclick="deleteData('education','{{id}}')">×</button>
+                    </div>
                 </div>
                 {% endfor %}
             </div>
         </div>
 
         <div class="card" id="card-projects">
-            <h3>🚀 Projects</h3>
+            <h3>🚀 Projects (Points View)</h3>
             <input type="text" id="pj-title" placeholder="Project Title">
-            <input type="text" id="pj-dom" placeholder="Domain">
-            <input type="text" id="pj-link" placeholder="GitHub/Live URL">
-            <textarea id="pj-desc" placeholder="Brief details about the project"></textarea>
+            <input type="text" id="pj-dom" placeholder="Domain (e.g. Machine Learning)">
+            <input type="text" id="pj-link" placeholder="Live/GitHub URL">
+            
+            <label style="font-size: 11px; color: var(--g-gray); margin-bottom: 8px;">DESCRIPTION POINTS (MAX 3)</label>
+            <input type="text" id="pj-p1" style="border-left: 3px solid var(--g-green)" placeholder="Point 1: Key feature or tech used">
+            <input type="text" id="pj-p2" style="border-left: 3px solid var(--g-green)" placeholder="Point 2: Development detail">
+            <input type="text" id="pj-p3" style="border-left: 3px solid var(--g-green)" placeholder="Point 3: Impact or Result">
+        
             <div class="action-group">
-                <button class="btn btn-primary" id="pj-btn" onclick="pushData('projects', {title:'pj-title', domain:'pj-dom', link:'pj-link', desc:'pj-desc'})">Add Project</button>
-                <button class="btn btn-outline" id="pj-cancel" onclick="cancelEdit('projects')">Cancel</button>
+                <button class="btn btn-primary" onclick="pushData('projects', {title:'pj-title', domain:'pj-dom', link:'pj-link', p1:'pj-p1', p2:'pj-p2', p3:'pj-p3'})">Save Project</button>
+                <button class="btn btn-outline" onclick="cancelEdit('projects')">Cancel</button>
             </div>
+        
             <div class="preview-list">
                 {% for id, item in data.get('projects', {}).items() %}
                 <div class="list-item">
-                    <span class="item-text">{{item.title}}</span>
-                    <button class="ctrl-btn" onclick="startEdit('projects','{{id}}')">✎</button>
+                    <span class="item-text"><b>{{item.title}}</b></span>
+                    <div class="item-ctrl">
+                        <button class="ctrl-btn" style="color:var(--g-blue)" onclick="startEdit('projects','{{id}}')">✎</button>
+                        <button class="ctrl-btn" style="color:var(--g-red)" onclick="deleteData('projects','{{id}}')">×</button>
+                    </div>
                 </div>
                 {% endfor %}
             </div>
@@ -171,7 +185,10 @@
                 {% for id, item in data.get('certifications', {}).items() %}
                 <div class="list-item">
                     <span class="item-text">{{item.short_title or item.title}}</span>
-                    <button class="ctrl-btn" onclick="startEdit('certifications','{{id}}')">✎</button>
+                    <div class="item-ctrl">
+                        <button class="ctrl-btn" style="color:var(--g-blue)" onclick="startEdit('certifications','{{id}}')">✎</button>
+                        <button class="ctrl-btn" style="color:var(--g-red)" onclick="deleteData('certifications','{{id}}')">×</button>
+                    </div>
                 </div>
                 {% endfor %}
             </div>
@@ -192,7 +209,10 @@
                 {% for id, item in data.get('internships', {}).items() %}
                 <div class="list-item">
                     <span class="item-text">{{item.role}} @ {{item.company}}</span>
-                    <button class="ctrl-btn" onclick="startEdit('internships','{{id}}')">✎</button>
+                    <div class="item-ctrl">
+                        <button class="ctrl-btn" style="color:var(--g-blue)" onclick="startEdit('internships','{{id}}')">✎</button>
+                        <button class="ctrl-btn" style="color:var(--g-red)" onclick="deleteData('internships','{{id}}')">×</button>
+                    </div>
                 </div>
                 {% endfor %}
             </div>
@@ -256,7 +276,9 @@
             document.getElementById('pj-title').value = item.title || '';
             document.getElementById('pj-dom').value = item.domain || '';
             document.getElementById('pj-link').value = item.link || '';
-            document.getElementById('pj-desc').value = item.desc || '';
+            document.getElementById('pj-p1').value = item.p1 || '';
+            document.getElementById('pj-p2').value = item.p2 || '';
+            document.getElementById('pj-p3').value = item.p3 || '';
         } else if (cat === 'certifications') {
             document.getElementById('c-title').value = item.title || '';
             document.getElementById('c-short').value = item.short_title || '';
