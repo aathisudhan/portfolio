@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Command Center | AATHISUDHAN A.</title>
+    <title>Admin Command Center</title>
     <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         :root { 
@@ -58,27 +58,27 @@
 
 <div class="nav-bar">
     <div class="logo">AATHISUDHAN <span style="font-weight:400; color:var(--g-gray)">/ Admin</span></div>
-    <div class="status-pill">● System Live</div>
+    <div class="status-pill">● SYSTEM LIVE</div>
 </div>
 
 <div class="container">
     <div class="bento-grid">
 
         <div class="card" id="card-profile">
-            <h3>👤 Profile Details</h3>
-            <input type="text" id="p-name" placeholder="Full Name" value="{{data.get('profile', {}).get('name', '')}}">
-            <input type="text" id="p-prof" placeholder="Current Profession" value="{{data.get('profile', {}).get('profession', '')}}">
-            <textarea id="p-desc" placeholder="Bio / Summary">{{data.get('profile', {}).get('description', '')}}</textarea>
+            <h3>Profile Details</h3>
+            <div><label>Full Name</label><input type="text" id="p-name" placeholder="Full Name" value="{{data.get('profile', {}).get('name', '')}}"></div>
+            <div><label>Profession</label><input type="text" id="p-prof" placeholder="Current Profession" value="{{data.get('profile', {}).get('profession', '')}}"></div>
+            <div><label>Bio</label><textarea id="p-desc" placeholder="Bio">{{data.get('profile', {}).get('description', '')}}</textarea></div>
             <div class="form-row">
                 <div><label>Date of Birth</label><input type="date" id="p-dob" value="{{data.get('profile', {}).get('dob', '')}}"></div>
                 <div><label>Phone Number</label><input type="tel" id="p-phone" placeholder="Phone" value="{{data.get('profile', {}).get('phone', '')}}"></div>
             </div>
-            <input type="email" id="p-email" placeholder="Email Address" value="{{data.get('profile', {}).get('email', '')}}">
+            <div><label>Email</label><input type="email" id="p-email" placeholder="Email Address" value="{{data.get('profile', {}).get('email', '')}}"></div>
             <div class="form-row">
-                <input type="text" id="p-city" placeholder="City" value="{{data.get('profile', {}).get('city', '')}}">
-                <input type="text" id="p-state" placeholder="State" value="{{data.get('profile', {}).get('state', '')}}">
+                <div><label>City</label><input type="text" id="p-city" placeholder="City" value="{{data.get('profile', {}).get('city', '')}}"></div>
+                <div><label>State</label><input type="text" id="p-state" placeholder="State" value="{{data.get('profile', {}).get('state', '')}}"></div>
             </div>
-            <input type="text" id="p-country" placeholder="Country" value="{{data.get('profile', {}).get('country', '')}}">
+            <div><label>Country</label><input type="text" id="p-country" placeholder="Country" value="{{data.get('profile', {}).get('country', '')}}"></div>
             <button class="btn btn-primary" onclick="pushData('profile', {name:'p-name', profession:'p-prof', description:'p-desc', dob:'p-dob', phone:'p-phone', email:'p-email', city:'p-city', state:'p-state', country:'p-country'})">Save Profile</button>
         </div>
 
@@ -94,7 +94,7 @@
         </div>
 
         <div class="card" id="card-skills">
-            <h3>🛠️ Technical Skills</h3>
+            <h3>Technical Skills</h3>
             <input type="text" id="sk-name" placeholder="Skill (e.g. React.js)">
             <select id="sk-level">
                 <option value="Beginner">Beginner</option>
@@ -120,7 +120,7 @@
         </div>
 
         <div class="card" id="card-education">
-            <h3>🎓 Education</h3>
+            <h3>Education</h3>
             <input type="text" id="edu-school" placeholder="School/University Name">
             <input type="text" id="edu-title" placeholder="Degree (e.g. B.Tech AI & DS)">
             <input type="text" id="edu-year" placeholder="Year / Duration">
@@ -142,7 +142,7 @@
         </div>
 
         <div class="card" id="card-projects">
-            <h3>🚀 Projects (Points View)</h3>
+            <h3>Projects</h3>
             <input type="text" id="pj-title" placeholder="Project Title">
             <input type="text" id="pj-dom" placeholder="Domain (e.g. Machine Learning)">
             <input type="text" id="pj-link" placeholder="Live/GitHub URL">
@@ -171,7 +171,7 @@
         </div>
 
         <div class="card" id="card-certifications">
-            <h3>📜 Certifications</h3>
+            <h3>Certifications</h3>
             <input type="text" id="c-title" placeholder="Certification Full Title">
             <input type="text" id="c-short" placeholder="Short Identifier (e.g. OCI-GenAI)">
             <input type="text" id="c-iss" placeholder="Issuing Organization">
@@ -195,7 +195,7 @@
         </div>
 
         <div class="card" id="card-internships">
-            <h3>💼 Internships & Experience</h3>
+            <h3>Internships</h3>
             <input type="text" id="ex-role" placeholder="Your Role">
             <input type="text" id="ex-comp" placeholder="Company Name">
             <input type="text" id="ex-dur" placeholder="Duration (e.g. Jan 2024 - Present)">
