@@ -223,142 +223,60 @@
 </div>
 
 <script>
-    // serverData available for client-side editing
     window.serverData = {{ data | tojson }};
     let currentEdit = {category: null, id: null};
 
-    function getVal(elId) {
-        const el = document.getElementById(elId);
-        if (!el) return null;
-        if (el.type === 'checkbox') return el.checked;
-        return el.value;
-    }
-
-    async function pushData(category, fieldIds) {
+    async function saveData(category, fieldMap) {
         const payload = {};
-        for (let key in fieldIds) {
-            const elId = fieldIds[key];
-            const el = document.getElementById(elId);
-            let val = null;
-            if (!el) { val = null; }
-            else if (el.type === 'checkbox') { val = el.checked; }
-            else { val = el.value; }
-
-            // If updating an existing single-record and any field empty, block client-side
-            const SINGLE = ['profile', 'description', 'socials'];
-            if (SINGLE.includes(category) && window.serverData[category] && (val === null || (typeof val === 'string' && val.trim() === ''))) {
-                alert('Please fill all fields in this card');
-                return;
+        
+        // 1. Collect values from the page
+        for (let [apiKey, elementId] of Object.entries(fieldMap)) {
+            const el = document.getElementById(elementId);
+            if (el) {
+                if (el.type === 'checkbox') {
+                    payload[apiKey] = el.checked;
+                } else {
+                    payload[apiKey] = el.value || ""; // Allow empty strings
+                }
             }
-
-            // For add operations require title for projects/certifications/achievements
-            if ((category === 'projects' || category === 'certifications' || category === 'achievements') && key === 'title') {
-                if (!val || val.trim() === '') { alert('Title is required'); return; }
-            }
-
-            // For education, require school and title
-            if (category === 'education' && (key === 'school' || key === 'title')) {
-                if (!val || (typeof val === 'string' && val.trim() === '')) { alert('School/College and Education Title are required'); return; }
-            }
-
-            // Skip empty optional fields (start_year, end_year for education)
-            if ((category === 'education' && (key === 'start_year' || key === 'end_year')) && (val === '' || val === null)) {
-                continue;
-            }
-
-            payload[key] = val;
         }
 
+        // 2. Determine URL and Method
+        // For 'profile' and 'socials', your Flask app uses .set() on the POST route
         let method = 'POST';
         let url = `/api/${category}`;
+
+        // If we are editing an existing item in a list (like projects)
         if (currentEdit.category === category && currentEdit.id) {
             method = 'PUT';
             url = `/api/${category}/${currentEdit.id}`;
         }
 
-        const response = await fetch(url, {
-            method,
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        });
+        // 3. Send to Flask
+        try {
+            const response = await fetch(url, {
+                method: method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
 
-        if (response.ok) location.reload();
-        else {
-            const err = await response.json().catch(()=>({message:'Error'}));
-            alert(err.message || 'Request failed');
+            if (response.ok) {
+                location.reload(); // Success!
+            } else {
+                const err = await response.json();
+                alert("Error: " + (err.error || "Failed to save"));
+            }
+        } catch (e) {
+            console.error(e);
+            alert("Connection error. Is the server running?");
         }
     }
 
+    // Keep your existing deleteData and startEdit functions here...
     async function deleteData(category, id) {
         if (!confirm('Delete this entry?')) return;
         const response = await fetch(`/api/${category}/${id}`, { method: 'DELETE' });
         if (response.ok) location.reload();
-    }
-
-    function startEdit(category, id) {
-        const src = (window.serverData && window.serverData[category] && window.serverData[category][id]) || null;
-        if (!src) { alert('Item data not available'); return; }
-        currentEdit = {category, id};
-        if (category === 'projects') {
-            document.getElementById('proj-title').value = src.title || '';
-            document.getElementById('proj-team').value = (src.team || []).join ? (src.team.join(', ')) : (src.team || '');
-            document.getElementById('proj-domain').value = src.domain || '';
-            document.getElementById('proj-desc').value = src.desc || '';
-            document.getElementById('proj-date').value = src.date || '';
-            document.getElementById('proj-link').value = src.link || '';
-            document.getElementById('proj-hide').checked = !!src.hidden;
-            document.getElementById('proj-action').innerText = 'Update Project';
-        }
-        if (category === 'certifications') {
-            document.getElementById('cert-title').value = src.title || '';
-            document.getElementById('cert-org').value = src.issuer || '';
-            document.getElementById('cert-start').value = src.start || '';
-            document.getElementById('cert-end').value = src.end || '';
-            document.getElementById('cert-domain').value = src.domain || '';
-            document.getElementById('cert-id').value = src.credid || '';
-            document.getElementById('cert-link').value = src.link || '';
-            document.getElementById('cert-hide').checked = !!src.hidden;
-            document.getElementById('cert-action').innerText = 'Update Cert';
-        }
-        if (category === 'internships') {
-            document.getElementById('exp-role').value = src.role || '';
-            document.getElementById('exp-comp').value = src.company || '';
-            document.getElementById('exp-desc').value = src.desc || '';
-            document.getElementById('exp-domain').value = src.domain || '';
-            document.getElementById('exp-duration').value = src.duration || '';
-            document.getElementById('exp-link').value = src.link || '';
-            document.getElementById('exp-hide').checked = !!src.hidden;
-            document.getElementById('exp-action').innerText = 'Update Experience';
-        }
-        if (category === 'skills') {
-            document.getElementById('skill-name').value = src.name || '';
-            document.getElementById('skill-val').value = src.value || '';
-            document.getElementById('skill-action').innerText = 'Update Skill';
-        }
-        if (category === 'education') {
-            document.getElementById('edu-school').value = src.school || '';
-            document.getElementById('edu-title').value = src.title || '';
-            document.getElementById('edu-start').value = src.start_year || '';
-            document.getElementById('edu-end').value = src.end_year || '';
-            document.getElementById('edu-action').innerText = 'Update Education';
-        }
-        if (category === 'contacts') {
-            document.getElementById('social-label').value = src.label || '';
-            document.getElementById('social-username').value = src.username || '';
-            document.getElementById('social-url').value = src.url || '';
-            document.getElementById('contact-action').innerText = 'Update Contact';
-        }
-    }
-
-    // Reset edit state if needed
-    function clearEdit() {
-        currentEdit = {category:null, id:null};
-        document.getElementById('proj-action').innerText = 'Add Project';
-        document.getElementById('cert-action').innerText = 'Add Cert';
-        document.getElementById('exp-action').innerText = 'Add Experience';
-        document.getElementById('contact-action').innerText = 'Add Contact';
-        document.getElementById('skill-action').innerText = 'Add Skill';
-        document.getElementById('edu-action').innerText = 'Add Education';
     }
 </script>
 
