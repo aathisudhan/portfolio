@@ -46,16 +46,32 @@
 
         <div class="card">
             <h3>👤 Profile (Single)</h3>
-            <input type="text" id="profile-name" placeholder="Full Name">
-            <input type="date" id="profile-dob" placeholder="Date of Birth">
-            <input type="text" id="profile-prof" placeholder="Profession">
-            <input type="text" id="profile-address" placeholder="Address">
-            <input type="tel" id="profile-phone" placeholder="Phone Number">
-            <input type="email" id="profile-email" placeholder="Email">
-            <button class="btn-add" onclick="pushData('profile', {name:'profile-name', dob:'profile-dob', profession:'profile-prof', address:'profile-address', phone:'profile-phone', email:'profile-email'})">Save Profile</button>
+            
+            <input type="text" id="profile-name" placeholder="Full Name" value="{{data.get('profile', {}).get('name', '')}}">
+            
+            <div style="display: flex; gap: 10px;">
+                <input type="text" id="profile-city" placeholder="City" value="{{data.get('profile', {}).get('city', '')}}">
+                <input type="text" id="profile-state" placeholder="State" value="{{data.get('profile', {}).get('state', '')}}">
+            </div>
+            
+            <input type="text" id="profile-country" placeholder="Country" value="{{data.get('profile', {}).get('country', '')}}">
+            
+            <label style="font-size: 12px; color: #5f6368; margin-bottom: 4px; display: block;">Date of Birth</label>
+            <input type="date" id="profile-dob" value="{{data.get('profile', {}).get('dob', '')}}">
+            
+            <input type="text" id="profile-prof" placeholder="Profession" value="{{data.get('profile', {}).get('profession', '')}}">
+            <input type="tel" id="profile-phone" placeholder="Phone Number" value="{{data.get('profile', {}).get('phone', '')}}">
+            <input type="email" id="profile-email" placeholder="Email" value="{{data.get('profile', {}).get('email', '')}}">
+            
+            <textarea id="profile-desc" placeholder="Bio / Description">{{data.get('profile', {}).get('description', '')}}</textarea>
+        
+            <button class="btn-add" onclick="saveProfile()">Save Profile</button>
+            
             <div class="list-container" id="profile-preview">
                 {% if data.get('profile') %}
-                <div class="live-item"><span>{{data.get('profile').get('name')}}</span></div>
+                <div class="live-item" style="border-left: 4px solid var(--g-blue);">
+                    <span><strong>Live:</strong> {{data.get('profile').get('name')}} ({{data.get('profile').get('city')}})</span>
+                </div>
                 {% else %}
                 <div class="empty-msg">No profile saved yet.</div>
                 {% endif %}
